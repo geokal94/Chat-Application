@@ -18,7 +18,15 @@ export default new Router({
       path: "/chat",
       name: "Chat",
       component: Chat,
-      props: true
+      props: true,
+      //route guard -->param name must exist to go to chat component
+      beforeEnter: (to, from, next) => {
+        if (to.params.name) {
+          next();
+        } else {
+          next({ name: "Welcome" });
+        }
+      }
     }
   ]
 });
