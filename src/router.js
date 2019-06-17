@@ -8,8 +8,7 @@ Vue.use(Router);
 export default new Router({
   mode: "history",
   base: process.env.BASE_URL,
-  routes: [
-    {
+  routes: [{
       path: "/",
       name: "Welcome",
       component: Welcome
@@ -24,7 +23,9 @@ export default new Router({
         if (to.params.name) {
           next();
         } else {
-          next({ name: "Welcome" });
+          next({
+            name: "Welcome"
+          });
         }
       }
     }

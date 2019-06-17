@@ -1,22 +1,28 @@
 <template>
-  <div id="app"> 
-    <router-view />
+  <div id="app">
+    <!-- <vue-particles color="#000000"></vue-particles> -->
+    <router-view/>
   </div>
-</template>
+</template> 
 
 <style>
-
-.welcome{
-  max-width:400px;
-  margin-top:100px;
+* {
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+}
+.welcome {
+  max-width: 400px;
+  margin-top: 100px;
 }
 
-.welcome h2{
-  font-size:3em;
+.welcome h2 {
+  font-size: 3em;
 }
 
-.welcome button{
-  margin:30px auto;
+.welcome button {
+  margin: 30px auto;
 }
 
+#app {
+  height: 100vh;
+}
 </style>
