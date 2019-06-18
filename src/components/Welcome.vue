@@ -2,12 +2,12 @@
   <div class="welcome container">
     <div class="card">
       <div class="card-content center-align">
-        <h2 class="light-blue-text text-lighten-1">Welcome</h2>
+        <h2 class="grey-text text-darken-3">Welcome</h2>
         <form @submit.prevent="enterChat">
-          <label for="name">Enter your chat name:</label>
-          <input type="text" name="name" v-model="name">
+          <label for="name" class="grey-text text-darken-3">Enter your chat name:</label>
+          <input type="text" name="name" autocomplete="off" v-model="name">
           <p v-if="feedback" class="red-text">{{ feedback }}</p>
-          <button class="btn light-blue lighten-1">Enter Chat</button>
+          <button class="btn grey-text text-darken-3">Enter Chat</button>
         </form>
       </div>
     </div>
@@ -36,6 +36,14 @@ export default {
 </script>
 
 <style>
+nav {
+  opacity: 0.9;
+}
+.welcome {
+  opacity: 0.9;
+  margin-top: auto;
+  margin-bottom: auto;
+}
 .welcome label {
   font-size: 1.1em;
 }

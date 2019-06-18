@@ -24,5 +24,11 @@
 
 #app {
   height: 100vh;
+  background-image: url("./assets/bg-img.jpg");
+  background-size: 100% 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 </style>
