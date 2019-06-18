@@ -18,7 +18,21 @@
         </div>
       </div>
       <div class="col s9">
-        <div class="card fixed-height">
+        <div class="card">
+          <div class="card-content cc1">
+            <form @submit.prevent="leaveChat">
+              <span>
+                <i class="material-icons left small">account_circle</i>
+                Welcome {{this.name}}
+                <!-- <button
+                  class="btn grey-text text-darken-3 right small"
+                >-->
+                <i id="iii" class="material-icons right small">list</i>
+                <!-- Disconnect -->
+                <!-- </button> -->
+              </span>
+            </form>
+          </div>
           <div class="card-content cc2" v-chat-scroll>
             <ul class="messages" v-chat-scroll>
               <li class="msg" v-for="(message,index) in messages" :key="index">
@@ -31,10 +45,15 @@
           <div class="card-action ca2">
             <div class="new-message">
               <form @submit.prevent="addMessage">
-                <label class="fs14 grey-text text-darken-3">Enter message:</label>
                 <div class="row">
                   <div class="col s9">
-                    <input type="text" name="new-message" autocomplete="off" v-model="newMessage">
+                    <input
+                      type="text"
+                      name="new-message"
+                      placeholder="Type your message"
+                      autocomplete="off"
+                      v-model="newMessage"
+                    >
                   </div>
                   <div class="col s3 center">
                     <button class="btn waves-effect waves-light" type="submit" name="action">
@@ -86,6 +105,9 @@ export default {
       } else {
         this.feedback = "You must enter a message in order to send one";
       }
+    },
+    leaveChat() {
+      this.$router.push({ name: "Welcome" });
     }
   },
   //set listener when component is created , order by timestamp
@@ -99,18 +121,45 @@ export default {
 </script>
 
 <style>
+.new-message input {
+  background: white !important;
+  padding: 2px 10px !important;
+  border-radius: 10px !important;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.27) !important;
+  overflow: auto !important;
+  margin-top: 6px;
+}
+.new-message button {
+  margin-top: 6px;
+  margin-left: 15px;
+  border-radius: 10px;
+  height: 42px;
+}
+form {
+  width: 100%;
+}
 .left-menu {
   background: #434753;
 }
+.cc1 {
+  height: 50px;
+  border-radius: 10px;
+  border-bottom: 3px solid white;
+  background: #eaeef1;
+  display: flex;
+  align-items: center;
+  color: #434753;
+}
 .cc2 {
-  min-height: 60vh;
-  max-height: 60vh;
+  height: 300px;
+  padding-top: 0 !important;
   overflow: auto;
+  background: #f2f5f8;
 }
 .ca2 {
-  min-height: 15vh;
-  max-height: 15vh;
-  background: #444;
+  height: 100px;
+  background: #f2f5f8 !important;
+  border-top: 3px solid white !important;
 }
 .fs18 {
   font-size: 18px;
@@ -131,8 +180,7 @@ export default {
 }
 
 .fixed-height {
-  min-height: 75vh;
-  max-height: 75vh;
+  height: 450px;
 }
 
 .card {

@@ -36,11 +36,8 @@ export default {
 </script>
 
 <style>
-nav {
-  opacity: 0.9;
-}
 .welcome {
-  opacity: 0.9;
+  opacity: 0.96;
   margin-top: auto;
   margin-bottom: auto;
 }
