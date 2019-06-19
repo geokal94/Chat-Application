@@ -1,16 +1,34 @@
 <template>
-  <div class="chat container">
+  <div class="chat container in-down">
     <div class="row">
       <div class="col s3">
         <div class="card fixed-height left-menu">
-          <div class="card-content">
-            <h5 class="center white-text">Online Users</h5>
+          <div class="card-content left-menu-top">
+            <h6 class="center white-text">Online users: 2</h6>
           </div>
-          <div class="card-action">
+          <div class="card-action" v-chat-scroll>
             <div class="card-content">
               <ul>
-                <li v-for="(user,index) in onlineUsers" :key="index">
-                  <span class="white-text">{{this.name}}:</span>
+                <li class="users-margin">
+                  <i
+                    class="material-icons left small material-icon white-text hide-icon"
+                  >account_circle</i>
+                  <span class="white-text">{{this.name}}</span>
+                  <i class="material-icons status-icon">brightness_1</i>
+                </li>
+                <li>
+                  <i
+                    class="material-icons left small material-icon white-text hide-icon"
+                  >account_circle</i>
+                  <span class="white-text">User 4</span>
+                  <i class="material-icons status-icon">brightness_1</i>
+                </li>
+                <li>
+                  <i
+                    class="material-icons left small material-icon white-text hide-icon"
+                  >account_circle</i>
+                  <span class="white-text">User 3</span>
+                  <i class="material-icons status-icon">brightness_1</i>
                 </li>
               </ul>
             </div>
@@ -19,19 +37,19 @@
       </div>
       <div class="col s9">
         <div class="card">
-          <div class="card-content cc1">
-            <form @submit.prevent="leaveChat">
+          <div class="card-content cc1 full-width">
+            <div class="full-width">
               <span>
-                <i class="material-icons left small">account_circle</i>
-                Welcome {{this.name}}
-                <!-- <button
-                  class="btn grey-text text-darken-3 right small"
-                >-->
-                <i id="iii" class="material-icons right small">list</i>
-                <!-- Disconnect -->
-                <!-- </button> -->
+                <i class="material-icons left small material-icon">account_circle</i>
+                {{this.name}}
+                <i class="material-icons status-icon">brightness_1</i>
+                <i
+                  @click="leaveChat"
+                  title="Disconnect"
+                  class="material-icons right power-icon"
+                >power_settings_new</i>
               </span>
-            </form>
+            </div>
           </div>
           <div class="card-content cc2" v-chat-scroll>
             <ul class="messages" v-chat-scroll>
@@ -55,10 +73,9 @@
                       v-model="newMessage"
                     >
                   </div>
-                  <div class="col s3 center">
-                    <button class="btn waves-effect waves-light" type="submit" name="action">
-                      Send
-                      <i class="material-icons right">send</i>
+                  <div class="col s3">
+                    <button class="btn waves-effect waves-light right" type="submit" name="action">
+                      <i class="material-icons center">send</i>
                     </button>
                   </div>
                 </div>
@@ -120,30 +137,85 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+@media only screen and (max-width: 991px) {
+  .hide-icon {
+    display: none;
+  }
+  .left-menu li {
+    text-align: center;
+  }
+}
+@media only screen and (max-width: 806px) {
+  .new-message input {
+    width: 80% !important;
+  }
+}
+@media only screen and (max-width: 520px) {
+  .new-message input {
+    width: 60% !important;
+  }
+}
+.users-margin {
+  margin-bottom: 8px;
+}
+
+.left-menu-top {
+  padding: 14px 24px;
+}
+.left-menu .card-action .card-content {
+  padding: 0;
+}
+.left-menu .card-action {
+  padding: 0 10px;
+  overflow: auto;
+  height: 390px;
+  border-bottom: 2px solid white !important;
+  border-top: 2px solid white !important;
+}
+
+.material-icon {
+  font-size: 30px;
+}
+i.power-icon {
+  font-size: 30px;
+  color: #bb2124;
+  cursor: pointer;
+}
+.align-center {
+  display: flex;
+  align-items: center;
+}
+i.status-icon {
+  color: green;
+  font-size: 8px;
+  margin-left: 5px;
+}
 .new-message input {
   background: white !important;
-  padding: 2px 10px !important;
-  border-radius: 10px !important;
+  padding: 2px 30px !important;
+  border-radius: 30px !important;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.27) !important;
   overflow: auto !important;
   margin-top: 6px;
-}
-.new-message button {
-  margin-top: 6px;
-  margin-left: 15px;
-  border-radius: 10px;
-  height: 42px;
-}
-form {
   width: 100%;
 }
+.new-message button {
+  border-radius: 30px;
+  height: 48px;
+  margin-top: 6px;
+}
+.full-width {
+  width: 100%;
+}
+
 .left-menu {
   background: #434753;
 }
 .cc1 {
   height: 50px;
-  border-radius: 10px;
+  border-top-right-radius: 30px !important;
+  border-top-left-radius: 30px !important;
   border-bottom: 3px solid white;
   background: #eaeef1;
   display: flex;
@@ -151,7 +223,7 @@ form {
   color: #434753;
 }
 .cc2 {
-  height: 300px;
+  height: 350px;
   padding-top: 0 !important;
   overflow: auto;
   background: #f2f5f8;
@@ -160,6 +232,8 @@ form {
   height: 100px;
   background: #f2f5f8 !important;
   border-top: 3px solid white !important;
+  border-bottom-right-radius: 30px !important;
+  border-bottom-left-radius: 30px !important;
 }
 .fs18 {
   font-size: 18px;
@@ -169,8 +243,8 @@ form {
 }
 .msg {
   background: white;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 10px 10px 10px 30px;
+  border-radius: 30px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.27);
   margin: 5px;
   overflow: auto;
@@ -180,12 +254,12 @@ form {
 }
 
 .fixed-height {
-  height: 450px;
+  height: 500px;
 }
 
 .card {
-  border-radius: 10px;
-  opacity: 0.97;
+  border-radius: 30px;
+  opacity: 0.85;
 }
 .chat h2 {
   font-size: 2.6em;

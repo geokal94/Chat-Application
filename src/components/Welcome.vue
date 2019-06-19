@@ -1,5 +1,5 @@
 <template>
-  <div class="welcome container">
+  <div class="welcome container in-down">
     <div class="card">
       <div class="card-content center-align">
         <h2 class="grey-text text-darken-3">Welcome</h2>
@@ -7,7 +7,7 @@
           <label for="name" class="grey-text text-darken-3">Enter your chat name:</label>
           <input type="text" name="name" autocomplete="off" v-model="name">
           <p v-if="feedback" class="red-text">{{ feedback }}</p>
-          <button class="btn grey-text text-darken-3">Enter Chat</button>
+          <button class="btn-large teal darken-3 large">Enter Chat</button>
         </form>
       </div>
     </div>
@@ -37,11 +37,21 @@ export default {
 
 <style>
 .welcome {
-  opacity: 0.96;
   margin-top: auto;
   margin-bottom: auto;
 }
+.welcome .card {
+  border-radius: 30px;
+  opacity: 0.85;
+}
 .welcome label {
-  font-size: 1.1em;
+  font-size: 1.15em;
+}
+.welcome button {
+  border-radius: 20px;
+}
+.welcome input {
+  text-align: center;
+  width: 80% !important;
 }
 </style>
