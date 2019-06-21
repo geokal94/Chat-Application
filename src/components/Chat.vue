@@ -4,30 +4,16 @@
       <div class="col s3">
         <div class="card fixed-height left-menu">
           <div class="card-content left-menu-top">
-            <h6 class="center white-text">Online users: 2</h6>
+            <h6 class="center white-text">Online users: {{this.num_of_onlineUsers}}</h6>
           </div>
           <div class="card-action" v-chat-scroll>
             <div class="card-content">
               <ul>
-                <li class="users-margin">
+                <li class="users-margin" v-for="(user, index) in onlineUsers" :key="index">
                   <i
                     class="material-icons left small material-icon white-text hide-icon"
                   >account_circle</i>
-                  <span class="white-text">{{this.name}}</span>
-                  <i class="material-icons status-icon">brightness_1</i>
-                </li>
-                <li>
-                  <i
-                    class="material-icons left small material-icon white-text hide-icon"
-                  >account_circle</i>
-                  <span class="white-text">User 4</span>
-                  <i class="material-icons status-icon">brightness_1</i>
-                </li>
-                <li>
-                  <i
-                    class="material-icons left small material-icon white-text hide-icon"
-                  >account_circle</i>
-                  <span class="white-text">User 3</span>
+                  <span class="white-text fs18">{{user.name}}</span>
                   <i class="material-icons status-icon">brightness_1</i>
                 </li>
               </ul>
@@ -90,6 +76,8 @@
 </template>
 
 <script>
+import axios from "axios";
+import { server } from "../helper";
 import moment from "moment"; //moment(time).format('lll');
 import io from "socket.io-client";
 
@@ -103,14 +91,23 @@ export default {
       user: "",
       content: "",
       messages: [],
+      num_of_onlineUsers: null,
       onlineUsers: [],
       socket: io("localhost:3000")
     };
   },
+  created() {
+    this.fetchUsers();
+  },
   methods: {
+    fetchUsers() {
+      axios
+        .get(`${server.baseURL}/users`)
+        .then(data => (this.onlineUsers = data.data));
+    },
     addMessage(e) {
       if (this.newMessage) {
-        e.preventDefault();
+        e.preventDefault(); // prevents page reloading
 
         this.socket.emit("SEND_MESSAGE", {
           user: this.name,
@@ -124,14 +121,29 @@ export default {
       }
     },
     leaveChat() {
-      this.$router.push({ name: "Welcome" });
+      location.reload(true); //reload and dont just change component so disconnect event is fired
     }
   },
-  //set listener when component is created , order by timestamp
   mounted() {
+    this.socket.on("NUM_OF_USERS", data => {
+      this.num_of_onlineUsers = data;
+    });
+
+    this.socket.emit("ADD_ONLINE_USER", {
+      username: this.name
+    });
+
+    this.socket.on("ONLINE_USERS", data => {
+      this.onlineUsers = data;
+    });
+
+    this.socket.on("REMOVE_USER", data => {
+      this.onlineUsers = data;
+    });
+
     this.socket.on("MESSAGE", data => {
       this.messages = [...this.messages, data];
-      // you can also do this.messages.push(data)
+      // or this.messages.push(data)
     });
   }
 };
