@@ -9,12 +9,16 @@
           <div class="card-action" v-chat-scroll>
             <div class="card-content">
               <ul>
-                <li class="users-margin" v-for="(user, index) in onlineUsers" :key="index">
-                  <i
-                    class="material-icons left small material-icon white-text hide-icon"
-                  >account_circle</i>
-                  <span class="white-text fs18">{{user.name}}</span>
-                  <i class="material-icons status-icon">brightness_1</i>
+                <li class="users-margin" v-for="(username, index) in onlineUsers" :key="index">
+                  <span>
+                    <i
+                      class="material-icons left small material-icon white-text hide-icon"
+                    >account_circle</i>
+                  </span>
+                  <span class="white-text fs18">{{username}}</span>
+                  <span>
+                    <i class="material-icons status-icon">brightness_1</i>
+                  </span>
                 </li>
               </ul>
             </div>
@@ -42,6 +46,14 @@
               <li class="msg" v-for="(message,index) in messages" :key="index">
                 <span class="teal-text">{{message.user}}:&nbsp;</span>
                 <span class="grey-text text-darken-3">{{message.message}}</span>
+                <span class="crud-buttons">
+                  <i
+                    class="material-icons"
+                    @click="deleteMessage"
+                    title="Delete message"
+                  >delete_forever</i>
+                  <i class="material-icons" @click="editMessage" title="Edit Message">edit</i>
+                </span>
                 <span class="grey-text time">{{message.timestamp}}</span>
               </li>
             </ul>
@@ -96,15 +108,7 @@ export default {
       socket: io("localhost:3000")
     };
   },
-  created() {
-    this.fetchUsers();
-  },
   methods: {
-    fetchUsers() {
-      axios
-        .get(`${server.baseURL}/users`)
-        .then(data => (this.onlineUsers = data.data));
-    },
     addMessage(e) {
       if (this.newMessage) {
         e.preventDefault(); // prevents page reloading
@@ -121,23 +125,21 @@ export default {
       }
     },
     leaveChat() {
+      this.socket.emit("REMOVE_ONLINE_USER", this.name);
       location.reload(true); //reload and dont just change component so disconnect event is fired
-    }
+    },
+    deleteMessage() {},
+    editMessage() {}
+  },
+  created() {
+    this.socket.emit("ADD_ONLINE_USER", this.name);
   },
   mounted() {
     this.socket.on("NUM_OF_USERS", data => {
       this.num_of_onlineUsers = data;
     });
 
-    this.socket.emit("ADD_ONLINE_USER", {
-      username: this.name
-    });
-
     this.socket.on("ONLINE_USERS", data => {
-      this.onlineUsers = data;
-    });
-
-    this.socket.on("REMOVE_USER", data => {
       this.onlineUsers = data;
     });
 
@@ -168,8 +170,17 @@ export default {
     width: 60% !important;
   }
 }
+
+.crud-buttons {
+  float: right;
+  color: #434753;
+  cursor: pointer;
+}
+
 .users-margin {
   margin-bottom: 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .left-menu-top {
@@ -182,8 +193,8 @@ export default {
   padding: 0 10px;
   overflow: auto;
   height: 390px;
-  border-bottom: 2px solid white !important;
-  border-top: 2px solid white !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.5) !important;
+  border-top: 2px solid rgba(255, 255, 255, 0.5) !important;
 }
 
 .material-icon {
@@ -259,7 +270,9 @@ i.status-icon {
   border-radius: 30px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.27);
   margin: 5px;
-  overflow: auto;
+  display: block;
+  height: auto !important;
+  overflow: auto !important;
 }
 .page-footer {
   padding: 0;
