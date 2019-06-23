@@ -120,19 +120,35 @@ export default {
         });
         this.newMessage = "";
         this.feedback = null;
+        let messageData = {
+          user: this.name,
+          message: this.newMessage
+          /* timestamp: moment(Date.now()).format("lll") */
+        };
+        this.__submitToServer(messageData);
       } else {
         this.feedback = "You must enter a message in order to send one";
       }
+    },
+    __submitToServer(data) {
+      axios.post(`${server.baseURL}/messages/create`, data).then(data => {});
     },
     leaveChat() {
       this.socket.emit("REMOVE_ONLINE_USER", this.name);
       location.reload(true); //reload and dont just change component so disconnect event is fired
     },
+    getMessages() {
+      axios
+        .get(`${server.baseURL}/messages/messages`)
+        .then(data => (this.messages = data.data));
+    },
     deleteMessage() {},
     editMessage() {}
   },
+
   created() {
     this.socket.emit("ADD_ONLINE_USER", this.name);
+    this.getMessages();
   },
   mounted() {
     this.socket.on("NUM_OF_USERS", data => {
