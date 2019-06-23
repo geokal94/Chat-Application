@@ -118,14 +118,15 @@ export default {
           message: this.newMessage,
           timestamp: moment(Date.now()).format("lll")
         });
-        this.newMessage = "";
         this.feedback = null;
         let messageData = {
           user: this.name,
-          message: this.newMessage
-          /* timestamp: moment(Date.now()).format("lll") */
+          message: this.newMessage,
+          timestamp: String(moment(Date.now()).format("lll"))
         };
+        /* console.log("messageData: ", messageData); */
         this.__submitToServer(messageData);
+        this.newMessage = "";
       } else {
         this.feedback = "You must enter a message in order to send one";
       }
