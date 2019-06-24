@@ -15,7 +15,7 @@
                       class="material-icons left small material-icon white-text hide-icon"
                     >account_circle</i>
                   </span>
-                  <span class="white-text fs18">{{username}}</span>
+                  <span class="white-text fs17">{{username}}</span>
                   <span>
                     <i class="material-icons status-icon">brightness_1</i>
                   </span>
@@ -43,18 +43,25 @@
           </div>
           <div class="card-content cc2" v-chat-scroll>
             <ul class="messages" v-chat-scroll>
-              <li class="msg" v-for="(message,index) in messages" :key="index">
+              <li
+                v-bind:class="{msg:true, sender:message.user === name}"
+                v-for="(message,index) in messages"
+                :key="index"
+              >
                 <span class="teal-text">{{message.user}}:&nbsp;</span>
                 <span class="grey-text text-darken-3">{{message.message}}</span>
-                <span class="crud-buttons">
-                  <i
-                    class="material-icons"
-                    @click="deleteMessage"
-                    title="Delete message"
-                  >delete_forever</i>
-                  <i class="material-icons" @click="editMessage" title="Edit Message">edit</i>
+
+                <span class="grey-text time">
+                  {{message.timestamp}}
+                  <span v-if="message.user === name" class="crud-buttons">
+                    <i
+                      class="material-icons"
+                      @click="deleteMessage"
+                      title="Delete message"
+                    >delete_forever</i>
+                    <i class="material-icons" @click="editMessage" title="Edit Message">edit</i>
+                  </span>
                 </span>
-                <span class="grey-text time">{{message.timestamp}}</span>
               </li>
             </ul>
           </div>
@@ -68,6 +75,7 @@
                       name="new-message"
                       placeholder="Type your message"
                       autocomplete="off"
+                      maxlength="300"
                       v-model="newMessage"
                     >
                   </div>
@@ -135,7 +143,6 @@ export default {
       axios.post(`${server.baseURL}/messages/create`, data).then(data => {});
     },
     leaveChat() {
-      this.socket.emit("REMOVE_ONLINE_USER", this.name);
       location.reload(true); //reload and dont just change component so disconnect event is fired
     },
     getMessages() {
@@ -143,13 +150,39 @@ export default {
         .get(`${server.baseURL}/messages/messages`)
         .then(data => (this.messages = data.data));
     },
-    deleteMessage() {},
-    editMessage() {}
+    deleteMessage(/* id */) {
+      /* axios
+        .delete(`${server.baseURL}/messages/delete?messageID=${id}`)
+        .then(data => {
+            console.log("delete message with data: ", data); 
+           window.location.reload(); 
+        }); */
+    },
+    editMessage(/* id */) {
+      /* let messageData = {
+        user: this.name,
+        message: this.newMessage,
+        timestamp: String(moment(Date.now()).format("lll"))
+      };
+      axios.put(
+        `${server.baseURL}/messages/update?messageID=${this.id}`,
+        messageData
+      ); */
+    },
+    onrefresh: function onrefresh(event) {
+      /* console.log("refreshed"); */
+      this.socket.emit("REMOVE_ONLINE_USER", this.name);
+    }
   },
-
+  deactivated() {
+    //on back button
+    /* console.log("deactivated"); */
+    location.reload(true);
+  },
   created() {
     this.socket.emit("ADD_ONLINE_USER", this.name);
     this.getMessages();
+    window.addEventListener("beforeunload", this.onrefresh);
   },
   mounted() {
     this.socket.on("NUM_OF_USERS", data => {
@@ -169,7 +202,10 @@ export default {
 </script>
 
 <style scoped>
-@media only screen and (max-width: 991px) {
+* {
+  word-wrap: break-word;
+}
+@media only screen and (max-width: 850px) {
   .hide-icon {
     display: none;
   }
@@ -275,21 +311,30 @@ i.status-icon {
   border-bottom-right-radius: 30px !important;
   border-bottom-left-radius: 30px !important;
 }
-.fs18 {
-  font-size: 18px;
+.fs17 {
+  font-size: 17px !important;
 }
-.fs14 {
-  font-size: 14px;
-}
+
 .msg {
-  background: white;
+  background: #f2f5f8;
   padding: 10px 10px 10px 30px;
   border-radius: 30px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.27);
   margin: 5px;
   display: block;
   height: auto !important;
+  width: 50% !important;
   overflow: auto !important;
+}
+.sender {
+  float: right;
+  background: white;
+}
+.messages span {
+  font-size: 17px !important;
+}
+.messages span i {
+  font-size: 18px !important;
 }
 .page-footer {
   padding: 0;
@@ -314,7 +359,7 @@ i.status-icon {
 
 .chat .time {
   display: block;
-  font-size: 0.9em;
+  font-size: 12px !important;
 }
 
 .messages {
