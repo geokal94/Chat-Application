@@ -45,8 +45,8 @@
             <ul class="messages" v-chat-scroll>
               <li
                 v-bind:class="{msg:true, sender:message.user === name}"
-                v-for="(message,index) in messages"
-                :key="index"
+                v-for="message in messages"
+                :key="message._id"
               >
                 <span class="teal-text">{{message.user}}:&nbsp;</span>
                 <span class="grey-text text-darken-3">{{message.message}}</span>
@@ -56,7 +56,7 @@
                   <span v-if="message.user === name" class="crud-buttons">
                     <i
                       class="material-icons"
-                      @click="deleteMessage"
+                      @click="deleteMessage(message._id)"
                       title="Delete message"
                     >delete_forever</i>
                     <i class="material-icons" @click="editMessage" title="Edit Message">edit</i>
@@ -113,7 +113,7 @@ export default {
       messages: [],
       num_of_onlineUsers: null,
       onlineUsers: [],
-      socket: io("localhost:3000")
+      socket: io("chat-application-45.herokuapp.com")
     };
   },
   methods: {
@@ -121,26 +121,26 @@ export default {
       if (this.newMessage) {
         e.preventDefault(); // prevents page reloading
 
-        this.socket.emit("SEND_MESSAGE", {
-          user: this.name,
-          message: this.newMessage,
-          timestamp: moment(Date.now()).format("lll")
-        });
-        this.feedback = null;
         let messageData = {
           user: this.name,
           message: this.newMessage,
           timestamp: String(moment(Date.now()).format("lll"))
         };
-        /* console.log("messageData: ", messageData); */
+
         this.__submitToServer(messageData);
+
+        this.socket.emit("SEND_MESSAGE", messageData);
+        this.feedback = null;
+
         this.newMessage = "";
       } else {
         this.feedback = "You must enter a message in order to send one";
       }
     },
     __submitToServer(data) {
-      axios.post(`${server.baseURL}/messages/create`, data).then(data => {});
+      axios.post(`${server.baseURL}/messages/create`, data).then(data => {
+        this.getMessages();
+      });
     },
     leaveChat() {
       location.reload(true); //reload and dont just change component so disconnect event is fired
@@ -150,13 +150,13 @@ export default {
         .get(`${server.baseURL}/messages/messages`)
         .then(data => (this.messages = data.data));
     },
-    deleteMessage(/* id */) {
-      /* axios
+    deleteMessage(id) {
+      axios
         .delete(`${server.baseURL}/messages/delete?messageID=${id}`)
         .then(data => {
-            console.log("delete message with data: ", data); 
-           window.location.reload(); 
-        }); */
+          console.log("delete message with data: ", data);
+          this.getMessages();
+        });
     },
     editMessage(/* id */) {
       /* let messageData = {
@@ -170,13 +170,13 @@ export default {
       ); */
     },
     onrefresh: function onrefresh(event) {
-      /* console.log("refreshed"); */
+      console.log("refreshed");
       this.socket.emit("REMOVE_ONLINE_USER", this.name);
     }
   },
   deactivated() {
     //on back button
-    /* console.log("deactivated"); */
+    console.log("deactivated");
     location.reload(true);
   },
   created() {

@@ -32,7 +32,7 @@ export default {
       name: null,
       feedback: null,
       incorrect_username: null,
-      socket: io("localhost:3000")
+      socket: io("chat-application-45.herokuapp.com")
     };
   },
   methods: {
