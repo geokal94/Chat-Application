@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import axios from "axios";
+import { server } from "../helper";
 import io from "socket.io-client";
 
 export default {
@@ -32,29 +34,36 @@ export default {
       name: null,
       feedback: null,
       incorrect_username: null,
+      users: [],
       socket: io("chat-application-45.herokuapp.com")
     };
   },
   methods: {
     enterChat() {
       if (this.name) {
-        this.socket.emit("CHECK_NAME", this.name);
-        this.socket.on("ALLOW_IN", data => {
-          if (data) {
-            /* console.log("success"); */
-            this.$router.push({ name: "Chat", params: { name: this.name } });
-          } else {
-            this.incorrect_username =
-              "Username currently in use. Please select another...";
-            /* console.log("user already exists"); */
-            this.feedback = null;
-          }
-        });
+        if (this.users.find(username => username.user === this.name)) {
+          this.incorrect_username =
+            "Username currently in use. Please select another...";
+          /* console.log("user already exists"); */
+          this.feedback = null;
+        } else {
+          /* console.log("success"); */
+
+          this.$router.push({ name: "Chat", params: { name: this.name } });
+        }
       } else {
         this.feedback = "You must enter a name to join";
         this.incorrect_username = null;
       }
+    },
+    getUsers() {
+      axios
+        .get(`${server.baseURL}/users/users`)
+        .then(data => (this.users = data.data));
     }
+  },
+  created() {
+    this.getUsers();
   }
 };
 </script>

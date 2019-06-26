@@ -4,7 +4,7 @@
       <div class="col s3">
         <div class="card fixed-height left-menu">
           <div class="card-content left-menu-top">
-            <h6 class="center white-text">Online users: {{this.num_of_onlineUsers}}</h6>
+            <h6 class="center white-text">Online users</h6>
           </div>
           <div class="card-action" v-chat-scroll>
             <div class="card-content">
@@ -15,7 +15,7 @@
                       class="material-icons left small material-icon white-text hide-icon"
                     >account_circle</i>
                   </span>
-                  <span class="white-text fs17">{{username}}</span>
+                  <span class="white-text fs17">{{username.user}}</span>
                   <span>
                     <i class="material-icons status-icon">brightness_1</i>
                   </span>
@@ -32,9 +32,14 @@
               <span>
                 <i class="material-icons left small material-icon">account_circle</i>
                 {{this.name}}
+              </span>
+              <span>
                 <i class="material-icons status-icon">brightness_1</i>
+              </span>
+              <span v-for="(username, index) in onlineUsers" :key="index">
                 <i
-                  @click="leaveChat"
+                  v-if="username.user === name"
+                  @click="deleteUser(username._id)"
                   title="Disconnect"
                   class="material-icons right power-icon"
                 >power_settings_new</i>
@@ -111,7 +116,6 @@ export default {
       user: "",
       content: "",
       messages: [],
-      num_of_onlineUsers: null,
       onlineUsers: [],
       socket: io("chat-application-45.herokuapp.com")
     };
@@ -127,7 +131,7 @@ export default {
           timestamp: String(moment(Date.now()).format("lll"))
         };
 
-        this.__submitToServer(messageData);
+        this.__submitToServer_message(messageData);
 
         this.socket.emit("SEND_MESSAGE", messageData);
         this.feedback = null;
@@ -137,18 +141,39 @@ export default {
         this.feedback = "You must enter a message in order to send one";
       }
     },
-    __submitToServer(data) {
+    __submitToServer_message(data) {
       axios.post(`${server.baseURL}/messages/create`, data).then(data => {
         this.getMessages();
       });
     },
-    leaveChat() {
-      location.reload(true); //reload and dont just change component so disconnect event is fired
+    deleteUser(id) {
+      axios.delete(`${server.baseURL}/users/delete?userID=${id}`).then(data => {
+        console.log("delete user with data: ", data);
+        this.$router.push({ name: "Welcome" });
+        /* location.reload(true); */
+      });
     },
     getMessages() {
       axios
         .get(`${server.baseURL}/messages/messages`)
         .then(data => (this.messages = data.data));
+    },
+    getUsers() {
+      axios
+        .get(`${server.baseURL}/users/users`)
+        .then(data => (this.onlineUsers = data.data));
+    },
+    addUser() {
+      let userData = {
+        user: this.name
+      };
+
+      this.__submitToServer_user(userData);
+    },
+    __submitToServer_user(data) {
+      axios.post(`${server.baseURL}/users/create`, data).then(data => {
+        this.getUsers();
+      });
     },
     deleteMessage(id) {
       axios
@@ -158,7 +183,7 @@ export default {
           this.getMessages();
         });
     },
-    editMessage(/* id */) {
+    editMessage(/* id  */) {
       /* let messageData = {
         user: this.name,
         message: this.newMessage,
@@ -166,12 +191,13 @@ export default {
       };
       axios.put(
         `${server.baseURL}/messages/update?messageID=${this.id}`,
-        messageData
+        messageData 
       ); */
     },
     onrefresh: function onrefresh(event) {
       console.log("refreshed");
-      this.socket.emit("REMOVE_ONLINE_USER", this.name);
+      /* this.socket.emit("REMOVE_ONLINE_USER", this.name); */
+      this.$router.push({ name: "Welcome" });
     }
   },
   deactivated() {
@@ -180,17 +206,15 @@ export default {
     location.reload(true);
   },
   created() {
-    this.socket.emit("ADD_ONLINE_USER", this.name);
+    this.addUser();
+    /* this.getUsers(); */
     this.getMessages();
     window.addEventListener("beforeunload", this.onrefresh);
   },
   mounted() {
     this.socket.on("NUM_OF_USERS", data => {
-      this.num_of_onlineUsers = data;
-    });
-
-    this.socket.on("ONLINE_USERS", data => {
-      this.onlineUsers = data;
+      //when tracing a new connection/disconnection update online users
+      this.getUsers();
     });
 
     this.socket.on("MESSAGE", data => {
