@@ -1,6 +1,6 @@
 # Chat Application
 
-###Built with Vue.js and socket.IO (frontend) and NestJS(backend)
+### Built with Vue.js and socket.IO (frontend) and NestJS(backend)
 
 ## Project setup
 ```
